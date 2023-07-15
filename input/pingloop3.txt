@@ -1,0 +1,26 @@
+Thu 07/13/2023 23:59:53.13 
+
+Pinging www.google.com [142.250.114.99] with 32 bytes of data:
+Reply from 142.250.114.99: bytes=32 time=12ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=13ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=11ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=12ms TTL=105
+
+Ping statistics for 142.250.114.99:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 11ms, Maximum = 13ms, Average = 12ms
+ 
+Fri 07/14/2023  0:00:01.20 
+
+Pinging www.google.com [142.250.114.99] with 32 bytes of data:
+Reply from 142.250.114.99: bytes=32 time=9ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=10ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=13ms TTL=105
+Reply from 142.250.114.99: bytes=32 time=10ms TTL=105
+
+Ping statistics for 142.250.114.99:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 9ms, Maximum = 13ms, Average = 10ms
+ 
