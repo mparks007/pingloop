@@ -53,6 +53,8 @@ from enum import Enum
 # Fri 07/14/2023 13:56:18.22
 # Ping request could not find host www.google.com. Please check the name and try again.
 
+# set Enum to type str but forget why (I think I had in a print statement at some point)
+
 
 class PingHealth(str, Enum):
     UNKNOWN = 0
@@ -60,6 +62,8 @@ class PingHealth(str, Enum):
     PARTIALGOOD = 2
     ALLBAD = 3
     VERYBAD = 4
+
+# to store the four ping replies from a ping request
 
 
 class PingSubResult:
@@ -70,10 +74,13 @@ class PingSubResult:
     response = ''
     succeeded = False
 
+# main ping attempt and result(s)
+
 
 class PingResult:
     def __init__(self, timeStamp, pingSubResults=None):
         self.timeStamp = timeStamp
+        # I think this is how to reset a list (otherwise it was remember last time's object)
         if pingSubResults is None:
             self.pingSubResults = []
 
@@ -106,7 +113,7 @@ def LoadPingResults(filename):
             if len(pingResultsLine.rstrip('\n').strip()) < 1:
                 continue
 
-            # only try to match a time stamp if no already digging within a timestamp block
+            # only try to match a time stamp if not already digging within a timestamp block
             if not inNewResultBlock:
 
                 # try to find date/time (start of next ping attempt)
@@ -126,6 +133,7 @@ def LoadPingResults(filename):
                 if goodRequestMatch:
                     pingResult.pingRequest = pingResultsLine
 
+                    # initially, assume all good, but these will get overridden if find bad
                     pingResult.pingHealth = PingHealth.ALLGOOD
                     badPingCount = 0
 
@@ -133,6 +141,7 @@ def LoadPingResults(filename):
                     for i in range(4):
                         pingResultsLine = pingResultsFile.readline().rstrip('\n')
 
+                        # capture the two types of ping responses, result or timed out (though I have no clue if there can be other types of responses)
                         goodResponseMatch = re.match(
                             goodResponsePattern, pingResultsLine)
                         if goodResponseMatch:
@@ -143,6 +152,7 @@ def LoadPingResults(filename):
                                 PingSubResult(pingResultsLine, False))
                             badPingCount += 1
 
+                    # override defaulted good
                     if badPingCount == 4:
                         pingResult.pingHealth = PingHealth.ALLBAD
                     elif badPingCount > 0:
@@ -160,6 +170,7 @@ def LoadPingResults(filename):
 
     return pingResults
 
+# all individual fails per ping attempt
 # ALLBAD|07/13/2023 20:24:30.15
 # PARTIALGOOD|07/13/2023 20:24:53.21
 # PARTIALGOOD|07/13/2023 20:42:56.19
@@ -170,6 +181,8 @@ def LoadPingResults(filename):
 # PARTIALGOOD|07/14/2023 12:39:27.21
 # VERYBAD|07/14/2023 13:18:19.14
 # VERYBAD|07/14/2023 13:18:35.22
+
+# durations summary
 
 
 def SummarizePingFailures(pingResults):
@@ -185,6 +198,7 @@ def SummarizePingFailures(pingResults):
         for i in range(len(pingResults)):
             pingResult = pingResults[i]
 
+            # build out results lists, by severity
             if pingResult.pingHealth == PingHealth.ALLGOOD:
                 allGood.append(pingResult.timeStamp)
             elif pingResult.pingHealth == PingHealth.PARTIALGOOD:
@@ -194,11 +208,10 @@ def SummarizePingFailures(pingResults):
             elif pingResult.pingHealth == PingHealth.VERYBAD:
                 veryBad.append(pingResult.timeStamp)
 
-            if pingResult.pingHealth != PingHealth.ALLGOOD:
-                outputLine = pingResult.pingHealth.name + \
-                    "|" + pingResult.timeStamp[4:] + "\n"
-                # ...
-                outputFile.write(outputLine)
+            # write out a format easy to parse in excel
+            outputLine = pingResult.pingHealth.name + \
+                "|" + pingResult.timeStamp[4:] + "\n"
+            outputFile.write(outputLine)
 
     print("Pings with all good results: " + str(len(allGood)))
     # print(allGood)
@@ -218,7 +231,7 @@ if __name__ == "__main__":
     # snag all the data from the ping loop capture
     pingResults = LoadPingResults('.\input\pingloop1.txt')
 
-    # print out failure cases/counts
+    # print out all results cases/counts
     SummarizePingFailures(pingResults)
 
     print('Done')
