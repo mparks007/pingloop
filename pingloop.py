@@ -78,19 +78,23 @@ class PingSubResult:
 
 
 class PingResult:
-    def __init__(self, timeStamp, pingSubResults=None):
+    def __init__(self, timeStamp, Id, pingSubResults=None):
         self.timeStamp = timeStamp
-        # I think this is how to reset a list (otherwise it was remember last time's object)
+        self.Id = Id
+        # I think this is how to reset a list (otherwise it was remembering last time's object)
         if pingSubResults is None:
             self.pingSubResults = []
 
     timeStamp = ''
+    Id = ''
     pingRequest = ''
     pingSubResults = []
     pingHealth = PingHealth.UNKNOWN
 
 
-def LoadPingResults(filename):
+def LoadPingResults(Id):
+
+    filename = '.\input\pingloop' + Id + '.txt'
 
     timeStampPattern = '^(?P<timeStamp>[A-Za-z]{3} \d{2}/\d{2}/\d{4}\s{1,2}\d{1,2}:\d{2}:\d{2}\.\d{2})'
     goodRequestPattern = '^(?P<goodRequest>Pinging)'
@@ -120,7 +124,7 @@ def LoadPingResults(filename):
                 timeStampMatch = re.match(timeStampPattern, pingResultsLine)
                 if timeStampMatch:
                     inNewResultBlock = True
-                    pingResult = PingResult(timeStampMatch.group('timeStamp'))
+                    pingResult = PingResult(timeStampMatch.group('timeStamp'), Id)
                     pingResults.append(pingResult)
                     continue
 
@@ -192,8 +196,10 @@ def SummarizePingFailures(pingResults):
     allBad = []
     veryBad = []
 
+    filename = ".\output\pingResults.txt"
+
     # open up the output file for CREATE/APPEND
-    with open(".\output\pingResults.txt", "a+", encoding="utf-8") as outputFile:
+    with open(filename, "a+", encoding="utf-8") as outputFile:
 
         for i in range(len(pingResults)):
             pingResult = pingResults[i]
@@ -208,10 +214,11 @@ def SummarizePingFailures(pingResults):
             elif pingResult.pingHealth == PingHealth.VERYBAD:
                 veryBad.append(pingResult.timeStamp)
 
-            # write out a format easy to parse in excel
-            outputLine = pingResult.pingHealth.name + \
-                "|" + pingResult.timeStamp[4:] + "\n"
+            # write out a csv format for excel usage
+            outputLine = pingResult.Id + "," + pingResult.pingHealth.name + "," + pingResult.timeStamp[4:] + "\n"
             outputFile.write(outputLine)
+
+    print("Results for ID: " + pingResults[0].Id)
 
     print("Pings with all good results: " + str(len(allGood)))
     # print(allGood)
@@ -228,9 +235,17 @@ def SummarizePingFailures(pingResults):
 
 if __name__ == "__main__":
 
-    # snag all the data from the ping loop capture
-    pingResults = LoadPingResults('.\input\pingloop1.txt')
+    # www.amazon.com pings
 
+    # snag all the data from the ping loop capture
+    pingResults = LoadPingResults('A')
+    # print out all results cases/counts
+    SummarizePingFailures(pingResults)
+
+    # www.google.com pings
+
+    # snag all the data from the ping loop capture
+    pingResults = LoadPingResults('G')
     # print out all results cases/counts
     SummarizePingFailures(pingResults)
 
