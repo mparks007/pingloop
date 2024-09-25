@@ -1,4 +1,6 @@
 import re
+import shutil
+import pathlib
 from enum import Enum
 
 # ----------------------------------------------------------------------
@@ -234,6 +236,10 @@ def SummarizePingFailures(pingResults):
 
 
 if __name__ == "__main__":
+
+    shutil.copyfile('.\output\pingResults.txt', '.\output\pingResults.prior.txt')
+    file_to_rem = pathlib.Path(".\output\pingResults.txt")
+    file_to_rem.unlink(True)
 
     # www.amazon.com pings
 
